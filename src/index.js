@@ -217,6 +217,7 @@ async function interactiveMode() {
   
   // Scrape each set
   const allCards = [];
+  const setsData = [];
   
   for (let i = 0; i < setUrls.length; i++) {
     const setUrl = setUrls[i];
@@ -224,11 +225,21 @@ async function interactiveMode() {
     
     try {
       await page.goto(setUrl, { waitUntil: 'domcontentloaded', timeout: 30000 });
-      await page.waitForTimeout(2000);
+      await page.waitForTimeout(3000);
       
       // Scroll to load all cards
       await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
-      await page.waitForTimeout(1000);
+      await page.waitForTimeout(2000);
+      
+      // Check for access denied
+      const pageTitle = await page.title();
+      const isAccessDenied = pageTitle.includes('Access') && pageTitle.includes('denied');
+      
+      if (isAccessDenied) {
+        console.log(`  ⚠ Access denied to "${pageTitle}" - skipping with longer delay`);
+        await page.waitForTimeout(5000); // Longer delay on access denied
+        continue;
+      }
       
       const cards = await page.evaluate(() => {
         const cards = [];
@@ -288,14 +299,31 @@ async function interactiveMode() {
       });
       
       const setTitle = await page.title();
-      console.log(`  ✓ Extracted ${cards.length} cards from "${setTitle.substring(0, 50)}"`);
-      allCards.push(...cards);
+      
+      if (cards.length > 0) {
+        console.log(`  ✓ Extracted ${cards.length} cards from "${setTitle.substring(0, 50)}"`);
+        // Add set info to each card
+        const cardsWithSet = cards.map(card => ({
+          ...card,
+          setName: setTitle,
+          setUrl: setUrl
+        }));
+        allCards.push(...cardsWithSet);
+        setsData.push({
+          setName: setTitle,
+          setUrl: setUrl,
+          cards: cardsWithSet
+        });
+      } else {
+        console.log(`  ⚠ No cards found in "${setTitle.substring(0, 50)}"`);
+      }
       
       // Delay between sets
-      await page.waitForTimeout(1000);
+      await page.waitForTimeout(1500);
       
     } catch (error) {
       console.log(`  ✗ Failed: ${error.message}`);
+      await page.waitForTimeout(3000);
     }
   }
   
@@ -303,11 +331,31 @@ async function interactiveMode() {
   console.log(`Total cards collected: ${allCards.length}`);
   console.log();
   
-  // Save cards to JSON for later export
+  // Save cards to JSON for later export - with set structure
   if (allCards.length > 0) {
     const cardsPath = path.resolve(__dirname, '..', 'output', 'cards.json');
-    require('fs').writeFileSync(cardsPath, JSON.stringify(allCards, null, 2));
+    const outputData = {
+      exportedAt: new Date().toISOString(),
+      classUrl: CONFIG.classUrl,
+      totalSets: setsData.length,
+      totalCards: allCards.length,
+      sets: setsData
+    };
+    require('fs').writeFileSync(cardsPath, JSON.stringify(outputData, null, 2));
     console.log(`Cards saved to: ${cardsPath}`);
+    console.log();
+  } else if (setsData.length > 0) {
+    // Save even if no cards (empty sets)
+    const cardsPath = path.resolve(__dirname, '..', 'output', 'cards.json');
+    const outputData = {
+      exportedAt: new Date().toISOString(),
+      classUrl: CONFIG.classUrl,
+      totalSets: setsData.length,
+      totalCards: 0,
+      sets: setsData
+    };
+    require('fs').writeFileSync(cardsPath, JSON.stringify(outputData, null, 2));
+    console.log(`Empty sets saved to: ${cardsPath}`);
     console.log();
   }
   
@@ -442,7 +490,22 @@ async function main() {
     if (require('fs').existsSync(cardsPath)) {
       console.log('Found saved cards from previous session.');
       console.log(`Loading from: ${cardsPath}`);
-      allCards = JSON.parse(require('fs').readFileSync(cardsPath, 'utf8'));
+      const data = JSON.parse(require('fs').readFileSync(cardsPath, 'utf8'));
+      
+      // Handle both old format (array) and new format (object with sets)
+      if (Array.isArray(data)) {
+        allCards = data;
+      } else if (data.sets && Array.isArray(data.sets)) {
+        // New format with sets structure
+        console.log(`Found ${data.totalSets || data.sets.length} sets`);
+        // Flatten all cards from all sets
+        data.sets.forEach(set => {
+          if (set.cards && Array.isArray(set.cards)) {
+            allCards.push(...set.cards);
+          }
+        });
+      }
+      
       console.log(`Loaded ${allCards.length} cards`);
       console.log();
     } else {
