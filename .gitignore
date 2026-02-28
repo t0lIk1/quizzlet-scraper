@@ -1,0 +1,25 @@
+# Dependencies
+node_modules/
+
+# Output files
+output/*.csv
+output/*.apkg
+output/*.png
+
+# Media files
+media/*
+
+# Environment
+.env
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
