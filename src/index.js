@@ -2,8 +2,152 @@ require('dotenv').config();
 const path = require('path');
 const readline = require('readline');
 const { chromium } = require('playwright');
+const notifier = require('node-notifier');
+const fs = require('fs');
 const { downloadAllMedia } = require('./utils');
 const { exportFlashcards } = require('./exporter');
+
+// Track failed and empty sets
+const failedSets = [];
+const emptySets = [];
+let allCards = [];
+let setsData = [];
+
+// URL tracking for resume functionality
+let urlProgress = {
+  classUrl: '',
+  scrapedAt: null,
+  urls: [] // [{ url, status: 'pending'|'completed'|'failed', error?: string, cards?: number }]
+};
+
+/**
+ * Load or create URL progress file
+ */
+function loadUrlProgress(progressPath) {
+  if (fs.existsSync(progressPath)) {
+    try {
+      urlProgress = JSON.parse(fs.readFileSync(progressPath, 'utf8'));
+      console.log(`📋 Loaded progress from: ${progressPath}`);
+      console.log(`   Total URLs: ${urlProgress.urls.length}`);
+      console.log(`   Completed: ${urlProgress.urls.filter(u => u.status === 'completed').length}`);
+      console.log(`   Failed: ${urlProgress.urls.filter(u => u.status === 'failed').length}`);
+      console.log(`   Pending: ${urlProgress.urls.filter(u => u.status === 'pending').length}`);
+      return true;
+    } catch (err) {
+      console.log(`⚠️  Could not load progress file, starting fresh`);
+    }
+  }
+  return false;
+}
+
+/**
+ * Save URL progress
+ */
+function saveUrlProgress(progressPath) {
+  urlProgress.scrapedAt = new Date().toISOString();
+  fs.writeFileSync(progressPath, JSON.stringify(urlProgress, null, 2), 'utf8');
+}
+
+/**
+ * Save failed sets log
+ */
+function saveFailedSetsLog() {
+  const logPath = path.resolve(__dirname, '..', 'failed-sets.log');
+  let logContent = 'Failed and Empty Sets Log\n';
+  logContent += `Generated: ${new Date().toISOString()}\n`;
+  logContent += '='.repeat(60) + '\n\n';
+
+  if (failedSets.length > 0) {
+    logContent += '❌ FAILED SETS (scraping error):\n';
+    logContent += '-'.repeat(60) + '\n';
+    failedSets.forEach((set, i) => {
+      logContent += `${i + 1}. ${set.name}\n`;
+      logContent += `   URL: ${set.url}\n`;
+      logContent += `   Error: ${set.error}\n\n`;
+    });
+  }
+
+  if (emptySets.length > 0) {
+    logContent += '⚠️  EMPTY SETS (0 cards found):\n';
+    logContent += '-'.repeat(60) + '\n';
+    emptySets.forEach((set, i) => {
+      logContent += `${i + 1}. ${set.name}\n`;
+      logContent += `   URL: ${set.url}\n\n`;
+    });
+  }
+
+  if (failedSets.length === 0 && emptySets.length === 0) {
+    logContent += '✅ All sets scraped successfully!\n';
+  }
+
+  logContent += '\n' + '='.repeat(60) + '\n';
+  logContent += `Total Failed: ${failedSets.length}\n`;
+  logContent += `Total Empty: ${emptySets.length}\n`;
+
+  fs.writeFileSync(logPath, logContent, 'utf8');
+  console.log(`Failed sets log saved to: ${logPath}`);
+}
+
+/**
+ * Save cards to JSON file (incremental save)
+ */
+function saveCardsIncremental() {
+  // Use absolute path from project root
+  const projectRoot = path.resolve(__dirname, '..');
+  const outputFolder = path.join(projectRoot, 'output');
+  const cardsPath = path.join(outputFolder, 'cards.json');
+  
+  // Don't save if no data
+  if (setsData.length === 0 && allCards.length === 0) {
+    console.log(`  ⚠️  No data to save (sets: ${setsData.length}, cards: ${allCards.length})`);
+    return;
+  }
+  
+  // Ensure output folder exists
+  if (!fs.existsSync(outputFolder)) {
+    fs.mkdirSync(outputFolder, { recursive: true });
+    console.log(`  📁 Created output folder: ${outputFolder}`);
+  }
+  
+  try {
+    const outputData = {
+      exportedAt: new Date().toISOString(),
+      lastUpdated: new Date().toISOString(),
+      classUrl: CONFIG.classUrl,
+      totalSets: setsData.length,
+      totalCards: allCards.length,
+      sets: setsData
+    };
+    fs.writeFileSync(cardsPath, JSON.stringify(outputData, null, 2), 'utf8');
+    console.log(`  💾 Saved: ${cardsPath}`);
+    console.log(`     Sets: ${setsData.length}, Cards: ${allCards.length}`);
+  } catch (err) {
+    console.error(`  ❌ Failed to save cards.json: ${err.message}`);
+    console.error(`     Path: ${cardsPath}`);
+    sendNotification('Save Failed', err.message, 'error');
+  }
+}
+
+/**
+ * Send desktop notification
+ * @param {string} title - Notification title
+ * @param {string} message - Notification message
+ * @param {string} urgency - 'info', 'warning', or 'error'
+ */
+function sendNotification(title, message, urgency = 'info') {
+  const icon = urgency === 'error' ? '❌' : urgency === 'warning' ? '⚠️' : '✅';
+  
+  notifier.notify({
+    title: `${icon} ${title}`,
+    message: message,
+    sound: urgency === 'error' ? true : false,
+    wait: false
+  }, (err) => {
+    if (err) {
+      console.log(`[Notification] ${title}: ${message}`);
+    }
+  });
+}
 
 // Configuration from environment
 const CONFIG = {
@@ -19,6 +163,13 @@ const CONFIG = {
   interactive: process.env.INTERACTIVE === 'true'
 };
 
+// Parse command line arguments
+const ARGS = {
+  resume: process.argv.includes('--resume') || process.argv.includes('-r'),
+  fresh: process.argv.includes('--fresh') || process.argv.includes('-f'),
+  help: process.argv.includes('--help') || process.argv.includes('-h')
+};
+
 /**
  * Sleep for a specified duration
  * @param {number} ms - Milliseconds to sleep
@@ -28,25 +179,75 @@ function sleep(ms) {
 }
 
 /**
+ * Show help message
+ */
+function showHelp() {
+  console.log(`
+Quizlet Scraper - Usage
+========================
+
+npm start [options]
+
+Options:
+  --resume, -r     Resume from failed/pending URLs (default behavior if url-progress.json exists)
+  --fresh, -f      Start fresh, ignore existing progress file
+  --help, -h       Show this help message
+
+Examples:
+  npm start                    # Run with default settings
+  npm start -- --fresh         # Start fresh, ignore previous progress
+  npm start -- --resume        # Resume from where you left off
+  npm start -- --help          # Show help
+
+Environment Variables (.env):
+  QUIZLET_CLASS_URL       - Your Quizlet class URL
+  QUIZLET_EMAIL           - Quizlet account email
+  QUIZLET_PASSWORD        - Quizlet account password
+  INTERACTIVE             - Set to 'true' for interactive mode
+  REQUEST_DELAY           - Delay between requests in ms (default: 5000)
+`);
+}
+
+/**
  * Interactive mode - browser stays open until user presses Ctrl+C
  * With optional auto-login and auto-scrape
  * @returns {Promise<Object>} - Storage state and class URL
  */
 async function interactiveMode() {
+  // Show help if requested
+  if (ARGS.help) {
+    showHelp();
+    process.exit(0);
+  }
+
   console.log('-'.repeat(60));
   console.log('INTERACTIVE MODE: Manual control');
   console.log('-'.repeat(60));
   console.log('A browser window will open and STAY OPEN.');
   console.log();
-  
+
+  // Show resume/fresh status
+  let progressPath = path.resolve(__dirname, '..', 'url-progress.json');
+  const hasProgress = fs.existsSync(progressPath);
+
+  if (ARGS.fresh && hasProgress) {
+    console.log('🗑️  Fresh start requested - removing old progress file...');
+    fs.unlinkSync(progressPath);
+    console.log('   Deleted: ' + progressPath);
+    console.log();
+  } else if (ARGS.resume && hasProgress) {
+    console.log('▶️  Resume mode - continuing from failed/pending URLs');
+    console.log();
+  }
+
   const hasCredentials = CONFIG.email && CONFIG.password;
-  
+
   if (hasCredentials) {
     console.log('Auto-login enabled with credentials from .env');
   } else {
     console.log('No credentials in .env - manual login required.');
   }
-  
+
   console.log();
   console.log('What to do:');
   console.log('1. Log in to Quizlet (automatic if credentials provided)');
@@ -168,79 +369,232 @@ async function interactiveMode() {
   console.log('📌 Scrolling through sets to load them...');
   await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
   await page.waitForTimeout(2000);
-  
-  // Extract all set URLs
-  console.log('Extracting set URLs from class page...');
-  const setUrls = await page.evaluate(() => {
-    const urls = new Set();
-    const links = document.querySelectorAll('a[href*="/"]');
+
+  // Check for Cloudflare page
+  async function checkCloudflare() {
+    const url = page.url();
+    const title = await page.title();
+    const isCloudflare = title.includes('Cloudflare') || 
+                         title.includes('Just a moment') ||
+                         title.includes('Один момент') ||
+                         url.includes('challenges.cloudflare.com');
     
-    links.forEach(link => {
-      const href = link.href;
-      if (href.includes('/quizlet.com/') && 
-          !href.includes('/class/') &&
-          !href.includes('/study/') &&
-          !href.includes('/learn/') &&
-          !href.includes('/test/') &&
-          !href.includes('/match/') &&
-          !href.includes('/gravity/') &&
-          !href.includes('/_/') &&
-          !href.includes('#')) {
-        const cleanUrl = href.split('?')[0].split('#')[0];
-        if (/\/quizlet\.com\/\d+\//.test(cleanUrl)) {
-          urls.add(cleanUrl);
+    if (isCloudflare) {
+      console.log();
+      console.log('⚠️  CLOUDFLARE DETECTED!');
+      console.log('----------------------------------------');
+      console.log('Please complete the Cloudflare challenge manually.');
+      console.log('The script will wait for you...');
+      console.log('----------------------------------------');
+      
+      sendNotification('Cloudflare Challenge', 'Please complete the verification in the browser', 'warning');
+      
+      // Wait for Cloudflare to be bypassed (check every 2 seconds)
+      let waited = 0;
+      while (waited < 300000) { // 5 minute timeout
+        await page.waitForTimeout(2000);
+        waited += 2000;
+        
+        const currentTitle = await page.title();
+        const currentUrl = page.url();
+        const stillCloudflare = currentTitle.includes('Cloudflare') || 
+                               currentTitle.includes('Just a moment') ||
+                               currentTitle.includes('Один момент') ||
+                               currentUrl.includes('challenges.cloudflare.com');
+        
+        if (!stillCloudflare) {
+          console.log('✓ Cloudflare bypassed! Continuing...');
+          sendNotification('Cloudflare Passed', 'Continuing with scraping', 'info');
+          await page.waitForTimeout(2000); // Wait for page to fully load
+          return true;
         }
       }
+      
+      console.log('✗ Cloudflare timeout after 5 minutes');
+      sendNotification('Cloudflare Timeout', 'Script timed out waiting for verification', 'error');
+      return false;
+    }
+    return true;
+  }
+
+  // Check for Cloudflare on current page
+  await checkCloudflare();
+
+  // Progress file path (reassign)
+  progressPath = path.resolve(__dirname, '..', 'url-progress.json');
+
+  // Try to load existing progress
+  const loadedProgress = loadUrlProgress(progressPath);
+  let pageUrls = [];
+
+  // If fresh start or no progress, extract URLs from page
+  if (ARGS.fresh || !loadedProgress || urlProgress.classUrl !== CONFIG.classUrl) {
+    console.log('Extracting set URLs from class page...');
+    pageUrls = await page.evaluate(() => {
+      const urls = new Set();
+      const links = document.querySelectorAll('a[href*="/"]');
+
+      links.forEach(link => {
+        const href = link.href;
+        if (href.includes('/quizlet.com/') &&
+            !href.includes('/class/') &&
+            !href.includes('/study/') &&
+            !href.includes('/learn/') &&
+            !href.includes('/test/') &&
+            !href.includes('/match/') &&
+            !href.includes('/gravity/') &&
+            !href.includes('/_/') &&
+            !href.includes('#')) {
+          const cleanUrl = href.split('?')[0].split('#')[0];
+          if (/\/quizlet\.com\/\d+\//.test(cleanUrl)) {
+            urls.add(cleanUrl);
+          }
+        }
+      });
+
+      // Check for set cards with data attributes
+      const setCards = document.querySelectorAll('[data-setid]');
+      setCards.forEach(card => {
+        const setId = card.getAttribute('data-setid');
+        if (setId) {
+          urls.add(`https://quizlet.com/${setId}`);
+        }
+      });
+
+      return Array.from(urls);
     });
 
-    // Check for set cards with data attributes
-    const setCards = document.querySelectorAll('[data-setid]');
-    setCards.forEach(card => {
-      const setId = card.getAttribute('data-setid');
-      if (setId) {
-        urls.add(`https://quizlet.com/${setId}`);
+    console.log(`Found ${pageUrls.length} sets on page`);
+
+    // Initialize or reset urlProgress
+    console.log('📋 Creating new progress file...');
+    urlProgress = {
+      classUrl: CONFIG.classUrl,
+      scrapedAt: null,
+      urls: pageUrls.map(url => ({ url, status: 'pending', error: null, cards: 0 }))
+    };
+  } else {
+    // Using existing progress - check for new URLs
+    console.log('Using existing progress file');
+    
+    // Extract URLs from page to check for new ones
+    pageUrls = await page.evaluate(() => {
+      const urls = new Set();
+      const links = document.querySelectorAll('a[href*="/"]');
+
+      links.forEach(link => {
+        const href = link.href;
+        if (href.includes('/quizlet.com/') &&
+            !href.includes('/class/') &&
+            !href.includes('/study/') &&
+            !href.includes('/learn/') &&
+            !href.includes('/test/') &&
+            !href.includes('/match/') &&
+            !href.includes('/gravity/') &&
+            !href.includes('/_/') &&
+            !href.includes('#')) {
+          const cleanUrl = href.split('?')[0].split('#')[0];
+          if (/\/quizlet\.com\/\d+\//.test(cleanUrl)) {
+            urls.add(cleanUrl);
+          }
+        }
+      });
+
+      const setCards = document.querySelectorAll('[data-setid]');
+      setCards.forEach(card => {
+        const setId = card.getAttribute('data-setid');
+        if (setId) {
+          urls.add(`https://quizlet.com/${setId}`);
+        }
+      });
+
+      return Array.from(urls);
+    });
+
+    // Add new URLs
+    const existingUrls = new Set(urlProgress.urls.map(u => u.url));
+    let newCount = 0;
+    pageUrls.forEach(url => {
+      if (!existingUrls.has(url)) {
+        urlProgress.urls.push({ url, status: 'pending', error: null, cards: 0 });
+        newCount++;
       }
     });
-
-    return Array.from(urls);
-  });
-  
-  console.log(`Found ${setUrls.length} sets`);
-  console.log();
-  
-  if (setUrls.length === 0) {
-    console.log('No sets found. You may need to scroll more or navigate manually.');
-    console.log('Press Ctrl+C when ready to save session and exit.');
-    await new Promise(() => {});
-    return;
+    if (newCount > 0) {
+      console.log(`➕ Added ${newCount} new URLs to progress`);
+      saveUrlProgress(progressPath);
+    }
   }
-  
-  // Scrape each set
-  const allCards = [];
-  const setsData = [];
-  
-  for (let i = 0; i < setUrls.length; i++) {
-    const setUrl = setUrls[i];
-    console.log(`[${i + 1}/${setUrls.length}] Scraping: ${setUrl}`);
-    
+
+  // Filter to only pending and failed URLs for scraping
+  const urlsToScrape = urlProgress.urls.filter(u => u.status === 'pending' || u.status === 'failed');
+  console.log(`URLs to scrape: ${urlsToScrape.length}`);
+  console.log();
+
+  if (urlsToScrape.length === 0) {
+    console.log('✅ All URLs already completed!');
+    console.log();
+    console.log('To scrape again, use:');
+    console.log('  npm start -- --fresh    # Reset all progress');
+    console.log('  npm start -- --resume   # Retry failed only');
+    console.log();
+    saveUrlProgress(progressPath);
+  }
+
+  // Scrape each set (use global allCards and setsData)
+  for (let i = 0; i < urlsToScrape.length; i++) {
+    const setUrl = urlsToScrape[i].url;
+    const urlIndex = urlProgress.urls.findIndex(u => u.url === setUrl);
+    console.log(`[${i + 1}/${urlsToScrape.length}] Scraping: ${setUrl}`);
+
     try {
       await page.goto(setUrl, { waitUntil: 'domcontentloaded', timeout: 30000 });
       await page.waitForTimeout(3000);
-      
+
+      // Check for Cloudflare
+      const cfPassed = await checkCloudflare();
+      if (!cfPassed) {
+        console.log(`  ⚠ Skipping due to Cloudflare`);
+        if (urlIndex >= 0) {
+          urlProgress.urls[urlIndex].status = 'failed';
+          urlProgress.urls[urlIndex].error = 'Cloudflare timeout';
+          saveUrlProgress(progressPath);
+        }
+        await page.waitForTimeout(5000);
+        continue;
+      }
+
       // Scroll to load all cards
       await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
       await page.waitForTimeout(2000);
-      
-      // Check for access denied
+
+      // Check for access denied or rate limit
       const pageTitle = await page.title();
       const isAccessDenied = pageTitle.includes('Access') && pageTitle.includes('denied');
-      
-      if (isAccessDenied) {
-        console.log(`  ⚠ Access denied to "${pageTitle}" - skipping with longer delay`);
-        await page.waitForTimeout(5000); // Longer delay on access denied
+      const isRateLimited = pageTitle.includes('429') || pageTitle.includes('Rate Limit');
+
+      if (isAccessDenied || isRateLimited) {
+        console.log(`  ⚠ ${isRateLimited ? 'Rate limited!' : 'Access denied'} - "${pageTitle}"`);
+        sendNotification(isRateLimited ? 'Rate Limited!' : 'Access Denied',
+                        `Waiting 30 seconds...`, 'warning');
+
+        // Track failed set and update progress
+        failedSets.push({
+          name: pageTitle,
+          url: setUrl,
+          error: isRateLimited ? 'Rate Limit (429)' : 'Access Denied'
+        });
+
+        if (urlIndex >= 0) {
+          urlProgress.urls[urlIndex].status = 'failed';
+          urlProgress.urls[urlIndex].error = isRateLimited ? 'Rate Limit (429)' : 'Access Denied';
+          saveUrlProgress(progressPath);
+        }
+
+        await page.waitForTimeout(30000); // Wait 30 seconds on rate limit
         continue;
       }
-      
+
       const cards = await page.evaluate(() => {
         const cards = [];
         const termElements = document.querySelectorAll('[data-term]');
@@ -299,7 +653,7 @@ async function interactiveMode() {
       });
       
       const setTitle = await page.title();
-      
+
       if (cards.length > 0) {
         console.log(`  ✓ Extracted ${cards.length} cards from "${setTitle.substring(0, 50)}"`);
         // Add set info to each card
@@ -314,23 +668,91 @@ async function interactiveMode() {
           setUrl: setUrl,
           cards: cardsWithSet
         });
+
+        // Update progress
+        if (urlIndex >= 0) {
+          urlProgress.urls[urlIndex].status = 'completed';
+          urlProgress.urls[urlIndex].cards = cards.length;
+          urlProgress.urls[urlIndex].error = null;
+          saveUrlProgress(progressPath);
+        }
+
+        // Save immediately after successful scrape
+        saveCardsIncremental();
       } else {
         console.log(`  ⚠ No cards found in "${setTitle.substring(0, 50)}"`);
+        sendNotification('No Cards Found', `"${setTitle.substring(0, 30)}"`, 'warning');
+
+        // Track empty set
+        emptySets.push({
+          name: setTitle,
+          url: setUrl
+        });
+
+        // Update progress - mark as completed even if empty
+        if (urlIndex >= 0) {
+          urlProgress.urls[urlIndex].status = 'completed';
+          urlProgress.urls[urlIndex].cards = 0;
+          saveUrlProgress(progressPath);
+        }
       }
-      
+
       // Delay between sets
       await page.waitForTimeout(1500);
-      
+
     } catch (error) {
       console.log(`  ✗ Failed: ${error.message}`);
+      sendNotification('Scraping Failed', `Set ${i + 1}/${urlsToScrape.length}: ${error.message}`, 'error');
+
+      // Track failed set and update progress
+      failedSets.push({
+        name: setTitle || `Set ${i + 1}`,
+        url: setUrl,
+        error: error.message
+      });
+
+      if (urlIndex >= 0) {
+        urlProgress.urls[urlIndex].status = 'failed';
+        urlProgress.urls[urlIndex].error = error.message;
+        saveUrlProgress(progressPath);
+      }
+
       await page.waitForTimeout(3000);
     }
   }
-  
+
   console.log();
   console.log(`Total cards collected: ${allCards.length}`);
   console.log();
-  
+
+  // Final progress save
+  saveUrlProgress(progressPath);
+  console.log(`📋 Progress saved to: ${progressPath}`);
+
+  // Print summary
+  const completed = urlProgress.urls.filter(u => u.status === 'completed').length;
+  const failed = urlProgress.urls.filter(u => u.status === 'failed').length;
+  const pending = urlProgress.urls.filter(u => u.status === 'pending').length;
+
+  console.log();
+  console.log('📊 Scraping Summary:');
+  console.log(`   Total URLs: ${urlProgress.urls.length}`);
+  console.log(`   ✅ Completed: ${completed}`);
+  console.log(`   ❌ Failed: ${failed}`);
+  console.log(`   ⏳ Pending: ${pending}`);
+  console.log();
+
+  // Send completion notification
+  if (allCards.length > 0) {
+    sendNotification('Scraping Complete!', `${allCards.length} cards from ${setsData.length} sets`, 'info');
+  } else {
+    sendNotification('Scraping Complete', 'No cards collected', 'warning');
+  }
+
+  // Save failed sets log
+  saveFailedSetsLog();
+  console.log();
+
   // Save cards to JSON for later export - with set structure
   if (allCards.length > 0) {
     const cardsPath = path.resolve(__dirname, '..', 'output', 'cards.json');

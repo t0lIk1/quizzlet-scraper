@@ -1,5 +1,27 @@
 const { chromium } = require('playwright');
 const path = require('path');
+const notifier = require('node-notifier');
+
+/**
+ * Send desktop notification
+ * @param {string} title - Notification title
+ * @param {string} message - Notification message
+ * @param {string} urgency - 'info', 'warning', or 'error'
+ */
+function sendNotification(title, message, urgency = 'info') {
+  const icon = urgency === 'error' ? '❌' : urgency === 'warning' ? '⚠️' : '✅';
+  
+  notifier.notify({
+    title: `${icon} ${title}`,
+    message: message,
+    sound: urgency === 'error' ? true : false,
+    wait: false
+  }, (err) => {
+    if (err) {
+      console.log(`[Notification] ${title}: ${message}`);
+    }
+  });
+}
 
 /**
  * Create a browser context with realistic settings
@@ -155,6 +177,27 @@ async function getFlashcardSet(setUrl, headless = true) {
   try {
     console.log(`Scraping set: ${setUrl}`);
     await page.goto(setUrl, { waitUntil: 'networkidle', timeout: 60000 });
+
+    // Check for Cloudflare
+    const title = await page.title();
+    const isCloudflare = title.includes('Cloudflare') || 
+                         title.includes('Just a moment') ||
+                         title.includes('Один момент');
+    
+    if (isCloudflare) {
+      console.log('⚠️  CLOUDFLARE DETECTED - Non-interactive mode cannot handle this');
+      console.log('Please run with INTERACTIVE=true to complete Cloudflare challenges manually');
+      sendNotification('Cloudflare Blocked', 'Run in interactive mode', 'error');
+      
+      await page.screenshot({ path: 'output/cloudflare-blocked.png' }).catch(() => {});
+      
+      return {
+        title: 'Cloudflare Blocked',
+        url: setUrl,
+        cards: [],
+        error: 'cloudflare'
+      };
+    }
 
     // Wait for flashcards to load
     await page.waitForSelector('[data-term], .SetPageTerm-card', { timeout: 10000 }).catch(() => {
