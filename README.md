@@ -9,6 +9,8 @@
 - ✅ Извлечение пар слов (английский → русский)
 - ✅ Скачивание изображений и аудио
 - ✅ Экспорт в CSV и .apkg форматы
+- ✅ **Генерация отдельных .apkg файлов для каждого набора**
+- ✅ **Автоматическое скачивание и вставка аудио в карточки**
 - ✅ Обход CAPTCHA через интерактивный режим
 - ✅ **Автосохранение прогресса** — можно возобновить после ошибки
 - ✅ **Desktop уведомления** — уведомления об ошибках и завершении
@@ -117,11 +119,38 @@ npm start
 - Скачает изображения и аудио
 - Создаст CSV и .apkg файлы
 
+### Генерация отдельных APKG для каждого набора
+
+После скрапинга запустите генератор:
+
+```bash
+npm run anki
+```
+
+Это создаст:
+- **Отдельный .apkg файл для каждого набора карточек**
+- Имя файла соответствует названию набора
+- Все аудиофайлы скачиваются и вставляются в карточки
+- Файлы сохраняются в папку `anki-output/`
+
+Пример:
+```
+anki-output/
+├── A1_Outcomes_Unit_1.apkg
+├── A1_Outcomes_Unit_2.apkg
+├── A2_Vocabulary_Unit_5.apkg
+└── media/
+    ├── audio_A1_Outcomes_Unit_1_0.mp3
+    ├── audio_A1_Outcomes_Unit_1_1.mp3
+    └── ...
+```
+
 ## Результат
 
 - `output/cards.json` — собранные карточки
 - `output/quizlet-export.csv` — CSV файл
-- `output/quizlet-export.apkg` — пакет Anki
+- `output/quizlet-export.apkg` — общий Anki пакет
+- `anki-output/` — отдельные APKG для каждого набора
 - `media/` — изображения и аудио файлы
 - `url-progress.json` — прогресс скрапинга
 - `failed-sets.log` — логи ошибок
@@ -138,19 +167,23 @@ npm start
 ```
 quizlet-downloader/
 ├── src/
-│   ├── index.js      # Главный скрипт
-│   ├── scraper.js    # Логика парсинга
-│   ├── exporter.js   # Экспорт CSV/APKG
-│   └── utils.js      # Утилиты
+│   ├── index.js          # Главный скрипт
+│   ├── scraper.js        # Логика парсинга
+│   ├── exporter.js       # Экспорт CSV/APKG
+│   ├── utils.js          # Утилиты
+│   └── anki-generator.js # Генерация отдельных APKG
 ├── output/
-│   ├── cards.json    # Собранные карточки
-│   ├── *.csv         # CSV экспорт
-│   └── *.apkg        # Anki пакет
-├── media/            # Изображения и аудио
-├── .env              # Конфигурация
-├── .storage-state.json  # Сессия браузера
-├── url-progress.json  # Прогресс скрапинга
-├── failed-sets.log    # Логи ошибок
+│   ├── cards.json        # Собранные карточки
+│   ├── *.csv             # CSV экспорт
+│   └── *.apkg            # Общий Anki пакет
+├── anki-output/          # Отдельные APKG для каждого набора
+│   ├── *.apkg
+│   └── media/            # Аудио файлы для APKG
+├── media/                # Изображения и аудио
+├── .env                  # Конфигурация
+├── .storage-state.json   # Сессия браузера
+├── url-progress.json     # Прогресс скрапинга
+├── failed-sets.log       # Логи ошибок
 └── package.json
 ```
 

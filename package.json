@@ -9,10 +9,12 @@
   "scripts": {
     "start": "node src/index.js",
     "export": "node src/index.js",
+    "anki": "node src/anki-generator.js",
+    "resume": "node src/resume-scraper.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-    "anki-apkg-export": "^4.0.2",
+    "anki-apkg-export": "^4.0.3",
     "axios": "^1.6.0",
     "dotenv": "^16.3.1",
     "node-notifier": "^10.0.1",

@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const APKG = require('anki-apkg-export');
+const createAPKG = require('anki-apkg-export').default;
 
 /**
  * Export flashcards to CSV format
@@ -121,26 +121,39 @@ async function exportToAPKG(cards, outputPath, setTitle = 'Quizlet Export', medi
     });
   }
 
-  // Create APKG with media
-  const apkg = new APKG(deck);
-  
-  // Add media files
-  for (const [filename, filepath] of mediaFiles) {
-    if (fs.existsSync(filepath)) {
-      const fileContent = fs.readFileSync(filepath);
-      apkg.addMedia(filename, fileContent);
-    }
-  }
+  try {
+    // Create APKG using the default export function
+    const apkg = createAPKG(setTitle);
 
-  // Generate and save the APKG file
-  const buffer = await apkg.generate();
-  fs.writeFileSync(outputPath, buffer);
-  
-  console.log(`APKG exported to: ${outputPath}`);
-  console.log(`Total cards: ${cards.length}`);
-  console.log(`Media files included: ${mediaFiles.size}`);
-  
-  return outputPath;
+    // Add cards
+    for (const card of deck.cards) {
+      apkg.addCard(card.front, card.back);
+    }
+
+    // Add media files
+    for (const [filename, filepath] of mediaFiles) {
+      if (fs.existsSync(filepath)) {
+        const fileContent = fs.readFileSync(filepath);
+        apkg.addMedia(filename, fileContent);
+      }
+    }
+
+    // Generate and save the APKG file
+    const buffer = await apkg.save();
+    fs.writeFileSync(outputPath, buffer);
+    
+    console.log(`APKG exported to: ${outputPath}`);
+    console.log(`Total cards: ${cards.length}`);
+    console.log(`Media files included: ${mediaFiles.size}`);
+
+    return outputPath;
+  } catch (error) {
+    console.log(`APKG generation failed: ${error.message}`);
+    console.log(`Falling back to CSV export...`);
+    
+    // Fallback to CSV
+    return await exportToCSV(cards, outputPath.replace('.apkg', '.csv'), setTitle);
+  }
 }
 
 /**
