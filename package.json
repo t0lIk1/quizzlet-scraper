@@ -11,6 +11,7 @@
     "export": "node src/index.js",
     "anki": "node src/anki-generator.js",
     "resume": "node src/resume-scraper.js",
+    "validate": "node src/validator.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {

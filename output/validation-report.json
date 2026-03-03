@@ -1,0 +1,712 @@
+{
+  "validatedAt": "2026-03-03T08:03:40.043Z",
+  "statistics": {
+    "totalSets": 47,
+    "totalCardsFound": 1795,
+    "totalCardsMetadata": 1795
+  },
+  "issues": {
+    "emptyFront": [],
+    "emptyBack": [],
+    "identicalFrontBack": [],
+    "duplicatesWithinSets": [],
+    "crossSetDuplicates": [
+      {
+        "front": "learn to play the guitar",
+        "count": 2,
+        "firstSet": "Outcomes A1. Unit 2, p. 1 Flashcards | Quizlet"
+      },
+      {
+        "front": "pork",
+        "count": 2,
+        "firstSet": "Outcomes A1 Unit 11 FOOD Flashcards | Quizlet"
+      },
+      {
+        "front": "beef",
+        "count": 2,
+        "firstSet": "Outcomes A1 Unit 11 FOOD Flashcards | Quizlet"
+      },
+      {
+        "front": "lamb",
+        "count": 2,
+        "firstSet": "Outcomes A1 Unit 11 FOOD Flashcards | Quizlet"
+      },
+      {
+        "front": "garlic",
+        "count": 2,
+        "firstSet": "Outcomes A1 Unit 11 FOOD Flashcards | Quizlet"
+      },
+      {
+        "front": "onion",
+        "count": 2,
+        "firstSet": "Outcomes A1 Unit 11 FOOD Flashcards | Quizlet"
+      },
+      {
+        "front": "beans",
+        "count": 2,
+        "firstSet": "Outcomes A1 Unit 11 FOOD Flashcards | Quizlet"
+      },
+      {
+        "front": "seafood",
+        "count": 2,
+        "firstSet": "Outcomes A1 Unit 11 FOOD Flashcards | Quizlet"
+      },
+      {
+        "front": "call an ambulance",
+        "count": 2,
+        "firstSet": "Memorable experience Flashcards | Quizlet"
+      },
+      {
+        "front": "traffic jam",
+        "count": 2,
+        "firstSet": "Directions Flashcards | Quizlet"
+      },
+      {
+        "front": "area",
+        "count": 3,
+        "firstSet": "Outcomes A1. ALL UNITS Flashcards | Quizlet"
+      },
+      {
+        "front": "beautiful",
+        "count": 3,
+        "firstSet": "Outcomes A1. ALL UNITS Flashcards | Quizlet"
+      },
+      {
+        "front": "big",
+        "count": 3,
+        "firstSet": "Outcomes A1. ALL UNITS Flashcards | Quizlet"
+      },
+      {
+        "front": "building",
+        "count": 3,
+        "firstSet": "Outcomes A1. ALL UNITS Flashcards | Quizlet"
+      },
+      {
+        "front": "busy",
+        "count": 3,
+        "firstSet": "Outcomes A1. ALL UNITS Flashcards | Quizlet"
+      },
+      {
+        "front": "cheap",
+        "count": 3,
+        "firstSet": "Outcomes A1. ALL UNITS Flashcards | Quizlet"
+      },
+      {
+        "front": "cinema",
+        "count": 3,
+        "firstSet": "Outcomes A1. ALL UNITS Flashcards | Quizlet"
+      },
+      {
+        "front": "cold",
+        "count": 3,
+        "firstSet": "Outcomes A1. ALL UNITS Flashcards | Quizlet"
+      },
+      {
+        "front": "crime",
+        "count": 3,
+        "firstSet": "Outcomes A1. ALL UNITS Flashcards | Quizlet"
+      },
+      {
+        "front": "day",
+        "count": 3,
+        "firstSet": "Outcomes A1. ALL UNITS Flashcards | Quizlet"
+      },
+      {
+        "front": "dirty",
+        "count": 3,
+        "firstSet": "Outcomes A1. ALL UNITS Flashcards | Quizlet"
+      },
+      {
+        "front": "easy",
+        "count": 3,
+        "firstSet": "Outcomes A1. ALL UNITS Flashcards | Quizlet"
+      },
+      {
+        "front": "expensive",
+        "count": 4,
+        "firstSet": "Outcomes A1. ALL UNITS Flashcards | Quizlet"
+      },
+      {
+        "front": "famous",
+        "count": 3,
+        "firstSet": "Outcomes A1. ALL UNITS Flashcards | Quizlet"
+      },
+      {
+        "front": "house",
+        "count": 3,
+        "firstSet": "Outcomes A1. ALL UNITS Flashcards | Quizlet"
+      },
+      {
+        "front": "little",
+        "count": 3,
+        "firstSet": "Outcomes A1. ALL UNITS Flashcards | Quizlet"
+      },
+      {
+        "front": "love",
+        "count": 3,
+        "firstSet": "Outcomes A1. ALL UNITS Flashcards | Quizlet"
+      },
+      {
+        "front": "magazine",
+        "count": 3,
+        "firstSet": "Outcomes A1. ALL UNITS Flashcards | Quizlet"
+      },
+      {
+        "front": "month",
+        "count": 3,
+        "firstSet": "Outcomes A1. ALL UNITS Flashcards | Quizlet"
+      },
+      {
+        "front": "problem",
+        "count": 3,
+        "firstSet": "Outcomes A1. ALL UNITS Flashcards | Quizlet"
+      },
+      {
+        "front": "quiet",
+        "count": 3,
+        "firstSet": "Outcomes A1. ALL UNITS Flashcards | Quizlet"
+      },
+      {
+        "front": "relax",
+        "count": 3,
+        "firstSet": "Outcomes A1. ALL UNITS Flashcards | Quizlet"
+      },
+      {
+        "front": "safe",
+        "count": 3,
+        "firstSet": "Outcomes A1. ALL UNITS Flashcards | Quizlet"
+      },
+      {
+        "front": "sea",
+        "count": 3,
+        "firstSet": "Outcomes A1. ALL UNITS Flashcards | Quizlet"
+      },
+      {
+        "front": "shopping",
+        "count": 3,
+        "firstSet": "Outcomes A1. ALL UNITS Flashcards | Quizlet"
+      },
+      {
+        "front": "small",
+        "count": 3,
+        "firstSet": "Outcomes A1. ALL UNITS Flashcards | Quizlet"
+      },
+      {
+        "front": "summer",
+        "count": 3,
+        "firstSet": "Outcomes A1. ALL UNITS Flashcards | Quizlet"
+      },
+      {
+        "front": "swimming",
+        "count": 3,
+        "firstSet": "Outcomes A1. ALL UNITS Flashcards | Quizlet"
+      },
+      {
+        "front": "town",
+        "count": 3,
+        "firstSet": "Outcomes A1. ALL UNITS Flashcards | Quizlet"
+      },
+      {
+        "front": "visit",
+        "count": 3,
+        "firstSet": "Outcomes A1. ALL UNITS Flashcards | Quizlet"
+      },
+      {
+        "front": "walk",
+        "count": 3,
+        "firstSet": "Outcomes A1. ALL UNITS Flashcards | Quizlet"
+      },
+      {
+        "front": "winter",
+        "count": 3,
+        "firstSet": "Outcomes A1. ALL UNITS Flashcards | Quizlet"
+      },
+      {
+        "front": "work",
+        "count": 3,
+        "firstSet": "Outcomes A1. ALL UNITS Flashcards | Quizlet"
+      },
+      {
+        "front": "commit a crime",
+        "count": 3,
+        "firstSet": "Outcomes A1. ALL UNITS Flashcards | Quizlet"
+      },
+      {
+        "front": "do the shopping",
+        "count": 3,
+        "firstSet": "Outcomes A1. ALL UNITS Flashcards | Quizlet"
+      },
+      {
+        "front": "swimming pool",
+        "count": 4,
+        "firstSet": "Outcomes A1. ALL UNITS Flashcards | Quizlet"
+      },
+      {
+        "front": "swimming costume",
+        "count": 3,
+        "firstSet": "Outcomes A1. ALL UNITS Flashcards | Quizlet"
+      },
+      {
+        "front": "go for a walk",
+        "count": 3,
+        "firstSet": "Outcomes A1. ALL UNITS Flashcards | Quizlet"
+      },
+      {
+        "front": "bad",
+        "count": 3,
+        "firstSet": "Outcomes A1. ALL UNITS Flashcards | Quizlet"
+      },
+      {
+        "front": "become",
+        "count": 3,
+        "firstSet": "Outcomes A1. ALL UNITS Flashcards | Quizlet"
+      },
+      {
+        "front": "cathedral",
+        "count": 3,
+        "firstSet": "Outcomes A1. ALL UNITS Flashcards | Quizlet"
+      },
+      {
+        "front": "civil servant",
+        "count": 3,
+        "firstSet": "Outcomes A1. ALL UNITS Flashcards | Quizlet"
+      },
+      {
+        "front": "clinic",
+        "count": 3,
+        "firstSet": "Outcomes A1. ALL UNITS Flashcards | Quizlet"
+      },
+      {
+        "front": "clothes",
+        "count": 3,
+        "firstSet": "Outcomes A1. ALL UNITS Flashcards | Quizlet"
+      },
+      {
+        "front": "company",
+        "count": 3,
+        "firstSet": "Outcomes A1. ALL UNITS Flashcards | Quizlet"
+      },
+      {
+        "front": "department",
+        "count": 3,
+        "firstSet": "Outcomes A1. ALL UNITS Flashcards | Quizlet"
+      },
+      {
+        "front": "designer",
+        "count": 3,
+        "firstSet": "Outcomes A1. ALL UNITS Flashcards | Quizlet"
+      },
+      {
+        "front": "different",
+        "count": 3,
+        "firstSet": "Outcomes A1. ALL UNITS Flashcards | Quizlet"
+      },
+      {
+        "front": "enjoy",
+        "count": 3,
+        "firstSet": "Outcomes A1. ALL UNITS Flashcards | Quizlet"
+      },
+      {
+        "front": "free time",
+        "count": 3,
+        "firstSet": "Outcomes A1. ALL UNITS Flashcards | Quizlet"
+      },
+      {
+        "front": "get up",
+        "count": 3,
+        "firstSet": "Outcomes A1. ALL UNITS Flashcards | Quizlet"
+      },
+      {
+        "front": "go out",
+        "count": 3,
+        "firstSet": "Outcomes A1. ALL UNITS Flashcards | Quizlet"
+      },
+      {
+        "front": "go to bed",
+        "count": 3,
+        "firstSet": "Outcomes A1. ALL UNITS Flashcards | Quizlet"
+      },
+      {
+        "front": "great",
+        "count": 3,
+        "firstSet": "Outcomes A1. ALL UNITS Flashcards | Quizlet"
+      },
+      {
+        "front": "home",
+        "count": 3,
+        "firstSet": "Outcomes A1. ALL UNITS Flashcards | Quizlet"
+      },
+      {
+        "front": "interesting",
+        "count": 3,
+        "firstSet": "Outcomes A1. ALL UNITS Flashcards | Quizlet"
+      },
+      {
+        "front": "job",
+        "count": 3,
+        "firstSet": "Outcomes A1. ALL UNITS Flashcards | Quizlet"
+      },
+      {
+        "front": "journalist",
+        "count": 3,
+        "firstSet": "Outcomes A1. ALL UNITS Flashcards | Quizlet"
+      },
+      {
+        "front": "language",
+        "count": 3,
+        "firstSet": "Outcomes A1. ALL UNITS Flashcards | Quizlet"
+      },
+      {
+        "front": "like",
+        "count": 3,
+        "firstSet": "Outcomes A1. ALL UNITS Flashcards | Quizlet"
+      },
+      {
+        "front": "live",
+        "count": 3,
+        "firstSet": "Outcomes A1. ALL UNITS Flashcards | Quizlet"
+      },
+      {
+        "front": "local",
+        "count": 3,
+        "firstSet": "Outcomes A1. ALL UNITS Flashcards | Quizlet"
+      },
+      {
+        "front": "long hours",
+        "count": 3,
+        "firstSet": "Outcomes A1. ALL UNITS Flashcards | Quizlet"
+      },
+      {
+        "front": "money",
+        "count": 3,
+        "firstSet": "Outcomes A1. ALL UNITS Flashcards | Quizlet"
+      },
+      {
+        "front": "newspaper",
+        "count": 3,
+        "firstSet": "Outcomes A1. ALL UNITS Flashcards | Quizlet"
+      },
+      {
+        "front": "nice",
+        "count": 3,
+        "firstSet": "Outcomes A1. ALL UNITS Flashcards | Quizlet"
+      },
+      {
+        "front": "night",
+        "count": 3,
+        "firstSet": "Outcomes A1. ALL UNITS Flashcards | Quizlet"
+      },
+      {
+        "front": "people",
+        "count": 3,
+        "firstSet": "Outcomes A1. ALL UNITS Flashcards | Quizlet"
+      },
+      {
+        "front": "police station",
+        "count": 3,
+        "firstSet": "Outcomes A1. ALL UNITS Flashcards | Quizlet"
+      },
+      {
+        "front": "sleep",
+        "count": 3,
+        "firstSet": "Outcomes A1. ALL UNITS Flashcards | Quizlet"
+      },
+      {
+        "front": "speak",
+        "count": 3,
+        "firstSet": "Outcomes A1. ALL UNITS Flashcards | Quizlet"
+      },
+      {
+        "front": "studio",
+        "count": 3,
+        "firstSet": "Outcomes A1. ALL UNITS Flashcards | Quizlet"
+      },
+      {
+        "front": "tax",
+        "count": 3,
+        "firstSet": "Outcomes A1. ALL UNITS Flashcards | Quizlet"
+      },
+      {
+        "front": "want",
+        "count": 3,
+        "firstSet": "Outcomes A1. ALL UNITS Flashcards | Quizlet"
+      },
+      {
+        "front": "workplace",
+        "count": 3,
+        "firstSet": "Outcomes A1. ALL UNITS Flashcards | Quizlet"
+      },
+      {
+        "front": "difference between",
+        "count": 3,
+        "firstSet": "Outcomes A1. ALL UNITS Flashcards | Quizlet"
+      },
+      {
+        "front": "at home",
+        "count": 3,
+        "firstSet": "Outcomes A1. ALL UNITS Flashcards | Quizlet"
+      },
+      {
+        "front": "be interested in",
+        "count": 3,
+        "firstSet": "Outcomes A1. ALL UNITS Flashcards | Quizlet"
+      },
+      {
+        "front": "speak to someone",
+        "count": 3,
+        "firstSet": "Outcomes A1. ALL UNITS Flashcards | Quizlet"
+      },
+      {
+        "front": "boring",
+        "count": 3,
+        "firstSet": "Outcomes A1. ALL UNITS Flashcards | Quizlet"
+      },
+      {
+        "front": "businessman",
+        "count": 3,
+        "firstSet": "Outcomes A1. ALL UNITS Flashcards | Quizlet"
+      },
+      {
+        "front": "capital city",
+        "count": 3,
+        "firstSet": "Outcomes A1. ALL UNITS Flashcards | Quizlet"
+      },
+      {
+        "front": "city",
+        "count": 3,
+        "firstSet": "Outcomes A1. ALL UNITS Flashcards | Quizlet"
+      },
+      {
+        "front": "capital",
+        "count": 4,
+        "firstSet": "Outcomes A1. ALL UNITS Flashcards | Quizlet"
+      },
+      {
+        "front": "country",
+        "count": 3,
+        "firstSet": "Outcomes A1. ALL UNITS Flashcards | Quizlet"
+      },
+      {
+        "front": "east",
+        "count": 3,
+        "firstSet": "Outcomes A1. ALL UNITS Flashcards | Quizlet"
+      },
+      {
+        "front": "granddad",
+        "count": 3,
+        "firstSet": "Outcomes A1. ALL UNITS Flashcards | Quizlet"
+      },
+      {
+        "front": "hot",
+        "count": 3,
+        "firstSet": "Outcomes A1. ALL UNITS Flashcards | Quizlet"
+      },
+      {
+        "front": "know",
+        "count": 4,
+        "firstSet": "Outcomes A1. ALL UNITS Flashcards | Quizlet"
+      },
+      {
+        "front": "late",
+        "count": 3,
+        "firstSet": "Outcomes A1. ALL UNITS Flashcards | Quizlet"
+      },
+      {
+        "front": "middle",
+        "count": 4,
+        "firstSet": "Outcomes A1. ALL UNITS Flashcards | Quizlet"
+      },
+      {
+        "front": "name",
+        "count": 3,
+        "firstSet": "Outcomes A1. ALL UNITS Flashcards | Quizlet"
+      },
+      {
+        "front": "north",
+        "count": 3,
+        "firstSet": "Outcomes A1. ALL UNITS Flashcards | Quizlet"
+      },
+      {
+        "front": "parent",
+        "count": 4,
+        "firstSet": "Outcomes A1. ALL UNITS Flashcards | Quizlet"
+      },
+      {
+        "front": "part",
+        "count": 3,
+        "firstSet": "Outcomes A1. ALL UNITS Flashcards | Quizlet"
+      },
+      {
+        "front": "place",
+        "count": 3,
+        "firstSet": "Outcomes A1. ALL UNITS Flashcards | Quizlet"
+      },
+      {
+        "front": "receptionist",
+        "count": 4,
+        "firstSet": "Outcomes A1. ALL UNITS Flashcards | Quizlet"
+      },
+      {
+        "front": "south",
+        "count": 3,
+        "firstSet": "Outcomes A1. ALL UNITS Flashcards | Quizlet"
+      },
+      {
+        "front": "student",
+        "count": 4,
+        "firstSet": "Outcomes A1. ALL UNITS Flashcards | Quizlet"
+      },
+      {
+        "front": "surname",
+        "count": 3,
+        "firstSet": "Outcomes A1. ALL UNITS Flashcards | Quizlet"
+      },
+      {
+        "front": "open",
+        "count": 2,
+        "firstSet": "Outcomes A1. Unit 14, p. 2 Flashcards | Quizlet"
+      },
+      {
+        "front": "acting",
+        "count": 2,
+        "firstSet": "Outcomes A1. Unit 14, p. 1 Flashcards | Quizlet"
+      },
+      {
+        "front": "entertainment",
+        "count": 2,
+        "firstSet": "Outcomes A1. Unit 14, p. 1 Flashcards | Quizlet"
+      },
+      {
+        "front": "empty",
+        "count": 2,
+        "firstSet": "Outcomes A1. Unit 13, p. 1 Flashcards | Quizlet"
+      },
+      {
+        "front": "farmer",
+        "count": 2,
+        "firstSet": "Outcomes A1. Unit 13, p. 1 Flashcards | Quizlet"
+      },
+      {
+        "front": "farming",
+        "count": 2,
+        "firstSet": "Outcomes A1. Unit 13, p. 1 Flashcards | Quizlet"
+      },
+      {
+        "front": "high",
+        "count": 2,
+        "firstSet": "Outcomes A1. Unit 16, p. 1 Flashcards | Quizlet"
+      },
+      {
+        "front": "ground",
+        "count": 2,
+        "firstSet": "Outcomes A1. Unit 16, p. 2 Flashcards | Quizlet"
+      },
+      {
+        "front": "part-time",
+        "count": 2,
+        "firstSet": "Outcomes A1. Unit 11, p. 2 Flashcards | Quizlet"
+      },
+      {
+        "front": "work",
+        "count": 3,
+        "firstSet": "Outcomes A1. Unit 13, p. 2 Flashcards | Quizlet"
+      },
+      {
+        "front": "be under stress",
+        "count": 2,
+        "firstSet": "Outcomes A1. Unit 12, p. 2 Flashcards | Quizlet"
+      },
+      {
+        "front": "take turns",
+        "count": 2,
+        "firstSet": "Outcomes A1. Unit 12, p. 2 Flashcards | Quizlet"
+      },
+      {
+        "front": "feel",
+        "count": 2,
+        "firstSet": "Outcomes A1. Unit 5, p. 2 Flashcards | Quizlet"
+      },
+      {
+        "front": "waiter",
+        "count": 2,
+        "firstSet": "Outcomes A1. Unit 1 Flashcards | Quizlet"
+      },
+      {
+        "front": "university",
+        "count": 2,
+        "firstSet": "Outcomes A1. Unit 1 Flashcards | Quizlet"
+      },
+      {
+        "front": "church",
+        "count": 2,
+        "firstSet": "Outcomes A1. Unit 1 Flashcards | Quizlet"
+      },
+      {
+        "front": "mosque",
+        "count": 2,
+        "firstSet": "Outcomes A1. Unit 1 Flashcards | Quizlet"
+      },
+      {
+        "front": "museum",
+        "count": 2,
+        "firstSet": "Outcomes A1. Unit 1 Flashcards | Quizlet"
+      },
+      {
+        "front": "government",
+        "count": 2,
+        "firstSet": "Outcomes A1. Unit 1 Flashcards | Quizlet"
+      },
+      {
+        "front": "office",
+        "count": 2,
+        "firstSet": "Outcomes A1. Unit 1 Flashcards | Quizlet"
+      },
+      {
+        "front": "beach",
+        "count": 2,
+        "firstSet": "Outcomes A1. Unit 1 Flashcards | Quizlet"
+      },
+      {
+        "front": "river",
+        "count": 2,
+        "firstSet": "Outcomes A1. Unit 1 Flashcards | Quizlet"
+      },
+      {
+        "front": "traffic lights",
+        "count": 2,
+        "firstSet": "Outcomes A1. Unit 1 Flashcards | Quizlet"
+      },
+      {
+        "front": "driver",
+        "count": 2,
+        "firstSet": "Outcomes A1. Unit 2, p. 2"
+      },
+      {
+        "front": "year",
+        "count": 2,
+        "firstSet": "Outcomes A1. Unit 2, p. 2"
+      },
+      {
+        "front": "education",
+        "count": 2,
+        "firstSet": "Outcomes A1. Unit 7, p. 1"
+      },
+      {
+        "front": "useful",
+        "count": 2,
+        "firstSet": "Outcomes A1. Unit 6, p. 2"
+      },
+      {
+        "front": "competition",
+        "count": 2,
+        "firstSet": "Outcomes A1. Unit 10, p. 1"
+      }
+    ],
+    "missingSetUrl": [],
+    "missingSetUrlInCards": []
+  },
+  "summary": {
+    "totalIssues": 0,
+    "hasCriticalIssues": false
+  }
+}
